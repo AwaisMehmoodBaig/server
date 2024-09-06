@@ -10,12 +10,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set environment variables
+        run: |
+          echo "Setting environment variables"
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - name: Docker login
         run: |
-          docker login -u awais -p $DOCKER_PASSWORD
+          docker login -u AwaisBaig -p $DOCKER_PASSWORD
       - name: Build and push image
         run: |
           docker build -t my-server-image -f Dockerfile .

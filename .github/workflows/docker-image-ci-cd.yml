@@ -1,48 +1,48 @@
 name: Docker Image CI/CD
 
 on:
-  push:
-    branches:
-      - master
+push:
+branches:
+- master
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+build-and-deploy:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v2
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+  - name: Login to DockerHub
+    uses: docker/login-action@v1
+    with:
+      username: ${{ secrets.DOCKER_USERNAME }}
+      password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: awaismehmodbaig/server:latest
+  - name: Build and push image
+    uses: docker/build-push-action@v2
+    with:
+      context: .
+      push: true
+      tags: awaismehmodbaig/server:latest
 
-      - name: Update Docker Compose
-        run: |
-          sed -i 's/awaismehmodbaig\/server:.*/awaismehmodbaig\/server:latest/' docker-compose.yml
+  - name: Update Docker Compose
+    run: |
+      sed -i 's/awaismehmodbaig\/server:.*/awaismehmodbaig\/server:latest/' docker-compose.yml
 
-      - name: Pull and deploy new image
-        run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@18.208.216.186 "docker-compose pull && docker-compose up -d"
+  - name: Pull and deploy new image
+    run: |
+      ssh -o StrictHostKeyChecking=no ec2-user@18.208.216.186 "docker-compose pull && docker-compose up -d"
 
-      - name: Decode Slack token
-        id: decode
-        uses: github/codeql-action/decode-base64@v1
-        with:
-          encoded: ${{ secrets.SLACK_BOT_TOKEN }}
+  - name: Decode Slack token
+    id: decode
+    uses: github/codeql-action/decode-base64@v1
+    with:
+      encoded: ${{ secrets.SLACK_BOT_TOKEN }}
 
-      - name: Send deployment notification
-        uses: slack/api@v1
-        with:
-          token: ${{ steps.decode.outputs.decoded }}
-          channel: 'projectdicecamp'
-          text: 'New image deployed successfully!
+  - name: Send deployment notification
+    uses: slack/api@v1
+    with:
+      token: ${{ steps.decode.outputs.decoded }}
+      channel: 'projectdicecamp'
+      text: 'New image deployed successfully!'

@@ -3,25 +3,45 @@ name: Docker Image CI/CD
 on:
   push:
     branches:
-      - main
+      - master
 
-stages:
-  - build
-  - test
-  - deploy
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-build:
-  stage: build
-  script:
-    - docker build -t awaismehmodbaig/my-server-image .
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-test:
-  stage: test
-  script:
-    - docker run awaismehmodbaig/my-server-image /bin/bash -c "echo 'Running tests...'"
+      - name: Build and push image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: awaismehmodbaig/server:latest
 
-deploy:
-  stage: deploy
-  script:
-    - docker push awaismehmodbaig/my-server-image
-    - ssh -i $SSH_PRIVATE_KEY server@18.208.216.186 "docker pull awaismehmodbaig/my-server-image && docker run awaismehmodbaig/my-server-image"
+      - name: Update Docker Compose
+        run: |
+          sed -i 's/awaismehmodbaig\/server:.*/awaismehmodbaig\/server:latest/' docker-compose.yml
+
+      - name: Pull and deploy new image
+        uses: appleboy/ssh-action@v2
+        with:
+          host: 18.208.216.186
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker-compose pull
+            docker-compose up -d
+
+      - name: Send deployment notification
+        uses: slack/actions-slack@v2
+        with:
+          slack-token: ${{ secrets.SLACK_BOT_TOKEN | base64 --decode }}
+          channel: 'projectdicecamp'
+          message: 'New image deployed successfully!'

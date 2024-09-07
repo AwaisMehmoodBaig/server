@@ -31,14 +31,8 @@ jobs:
           sed -i 's/awaismehmodbaig\/server:.*/awaismehmodbaig\/server:latest/' docker-compose.yml
 
       - name: Pull and deploy new image
-        uses: frijol/ssh-action@v1
-        with:
-          host: 18.208.216.186
-          username: ec2-user
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            docker-compose pull
-            docker-compose up -d
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@18.208.216.186 "docker-compose pull && docker-compose up -d"
 
       - name: Decode Slack token
         id: decode
@@ -47,9 +41,8 @@ jobs:
           encoded: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Send deployment notification
-        uses: slack/actions-slack@v1
+        uses: slack/notify@v2
         with:
           slack-token: ${{ steps.decode.outputs.decoded }}
           channel: 'projectdicecamp'
           message: 'New image deployed successfully!'
-

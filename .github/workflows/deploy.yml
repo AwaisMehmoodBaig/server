@@ -23,4 +23,5 @@ jobs:
           aws-region: us-east-1
       - name: Deploy to AWS
         run: |
+          ssh-keyscan -H 18.208.216.186 >> ~/.ssh/known_hosts
           ssh -o "StrictHostKeyChecking=no" ubuntu@18.208.216.186 "docker-compose up -d"

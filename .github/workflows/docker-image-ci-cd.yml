@@ -40,8 +40,11 @@ jobs:
           encoded: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Send deployment notification
-        uses: slack/send-action@v1
+        uses: slack/api@v1
         with:
           token: ${{ steps.decode.outputs.decoded }}
+          method: POST
+          endpoint: chat.postMessage
+          params:
           channel: projectdicecamp
           text: New image deployed successfully!

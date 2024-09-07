@@ -4,6 +4,7 @@ volumes:
 
 services:
   server:
+    image: awaismehmodbaig/server:latest
     build:
       context: E:\Dicecamp\Devops\final project\part 1\Server
       dockerfile: Dockerfile
@@ -15,6 +16,7 @@ services:
       - default
 
   client:
+    image: awaismehmodbaig/client:latest
     build:
       context: E:\Dicecamp\Devops\final project\part 1\Client
       dockerfile: Dockerfile

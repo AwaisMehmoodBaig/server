@@ -42,6 +42,6 @@ jobs:
       - name: Send deployment notification
         uses: slack/actions-slack@v2
         with:
-          slack-token: ${{ secrets.SLACK_BOT_TOKEN | base64 --decode }}
+          slack-token: ${{ secrets.SLACK_BOT_TOKEN | base64_decode }}
           channel: 'projectdicecamp'
           message: 'New image deployed successfully!'

@@ -1,0 +1,27 @@
+name: Docker Image CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build -t awaismehmodbaig/my-server-image .
+
+test:
+  stage: test
+  script:
+    - docker run awaismehmodbaig/my-server-image /bin/bash -c "echo 'Running tests...'"
+
+deploy:
+  stage: deploy
+  script:
+    - docker push awaismehmodbaig/my-server-image
+    - ssh -i $SSH_PRIVATE_KEY server@18.208.216.186 "docker pull awaismehmodbaig/my-server-image && docker run awaismehmodbaig/my-server-image"

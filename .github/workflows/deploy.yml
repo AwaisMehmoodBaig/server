@@ -11,8 +11,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Pull new image
-        run: docker pull awaismehmodbaig/server:latest
+        run: docker pull awaismehmodbaig/my-server-image:latest
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

@@ -31,7 +31,7 @@ jobs:
           sed -i 's/awaismehmodbaig\/server:.*/awaismehmodbaig\/server:latest/' docker-compose.yml
 
       - name: Pull and deploy new image
-        uses: appleboy/ssh-action@v2
+        uses: appleboy/ssh-action@v1
         with:
           host: 18.208.216.186
           username: ec2-user
@@ -40,15 +40,9 @@ jobs:
             docker-compose pull
             docker-compose up -d
 
-      - name: Decode Slack token
-        id: decode
-        uses: github.actions/decode-base64@v1
-        with:
-          encoded: ${{ secrets.SLACK_BOT_TOKEN }}
-
       - name: Send deployment notification
-        uses: slack/actions-slack@v2
+        uses: slackapi/slack-github-action@v1
         with:
-          slack-token: ${{ steps.decode.outputs.decoded }}
+          slack-token: ${{ secrets.SLACK_BOT_TOKEN | decodeBase64 }}
           channel: 'projectdicecamp'
           message: 'New image deployed successfully!'

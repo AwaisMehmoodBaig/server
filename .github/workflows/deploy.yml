@@ -10,18 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       - name: Pull new image
         run: docker pull awaismehmodbaig/my-server-image:latest
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - name: Deploy to AWS
         run: |
+          mkdir -p ~/.ssh
           ssh-keyscan -H 18.208.216.186 >> ~/.ssh/known_hosts
           ssh -o "StrictHostKeyChecking=no" ubuntu@18.208.216.186 "docker-compose up -d"
+        env:
+          MY_VAR: ${{ secrets.MY_VAR }}

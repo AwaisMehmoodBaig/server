@@ -31,7 +31,7 @@ jobs:
           sed -i 's/awaismehmodbaig\/server:.*/awaismehmodbaig\/server:latest/' docker-compose.yml
 
       - name: Pull and deploy new image
-        uses: appleboy/ssh-action@v1
+        uses: ssh-action@v1
         with:
           host: 18.208.216.186
           username: ec2-user
